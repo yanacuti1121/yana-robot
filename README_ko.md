@@ -16,6 +16,7 @@ Yana Robot은 [XiaoZhi AI Chatbot](https://github.com/78/xiaozhi-esp32) 프로�
 
 ## 최근 업데이트
 
+- 새 보드: [`yana-wheelbot`](main/boards/yana-wheelbot) — 런타임에 전환 가능한 모터 백엔드(연속 회전 서보 페어 또는 L298N DC 드라이버), VL53L0X 추락 방지 센서, 듀얼 LED, 팔+목 서보, 전환 가능한 화면 방향/테마를 갖춘 바퀴형 로봇으로, 모두 MCP 도구로 노출됩니다. 클라우드 프로토콜과 동일한 로컬 WebSocket/MCP 채널로 제어하는 브라우저 기반 컨트롤 패널 [`apps/controller-web`](apps/controller-web)도 함께 제공됩니다.
 - 메인라인은 이제 ESP-IDF v6.0 이상을 대상으로 하며, v6.0.2를 권장 안정 버전으로 사용합니다. 이전 157개 릴리스 변형은 ESP-IDF v6.0.1에서 빌드 검증되었으며, 현재 매트릭스는 171개 변형을 포함하고 그중 170개가 IDF 6.0.x를 지원하며 ESP32-S31 변형은 IDF 6.1 이상이 필요합니다.
 - MQTT 및 BluFi 암호화 코드가 PSA Crypto로 마이그레이션되었습니다. IDF 6 컴포넌트 분리 및 서드파티 의존성 호환성도 처리되었습니다.
 - 오디오 파이프라인 동시성, MQTT/UDP 패킷 검증, 릴리스 매트릭스 선택 로직이 강화되었습니다.
@@ -116,6 +117,8 @@ Yana Robot은 [XiaoZhi AI Chatbot](https://github.com/78/xiaozhi-esp32) 프로�
 - [MCP 프로토콜 상호작용 흐름](docs/mcp-protocol.md) - 디바이스 측 MCP 프로토콜 구현
 - [MQTT + UDP 하이브리드 통신 프로토콜 문서](docs/mqtt-udp.md)
 - [상세한 WebSocket 통신 프로토콜 문서](docs/websocket.md)
+- [Yana Wheelbot 보드](main/boards/yana-wheelbot) - 바퀴형 로봇 보드: 모터 도구, ToF 추락 방지 센서, LED, 팔/목 서보
+- [Wheelbot 웹 컨트롤러](apps/controller-web) - 위 보드를 위한 브라우저 기반 컨트롤 패널
 
 ## 대형 모델 설정
 

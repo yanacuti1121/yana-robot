@@ -16,6 +16,7 @@ This repository is an independent continuation: it is not affiliated with, and d
 
 ## Recent Updates
 
+- New board: [`yana-wheelbot`](main/boards/yana-wheelbot) — a wheeled robot with a runtime-selectable motor backend (continuous-rotation servo pair or L298N DC driver), a VL53L0X anti-fall sensor, dual LEDs, arm+neck servos, and switchable display orientation/theme, all exposed as MCP tools. Comes with [`apps/controller-web`](apps/controller-web), a browser-based control panel that drives it over the same local WebSocket/MCP channel used by the cloud protocol.
 - The mainline now targets ESP-IDF v6.0 or later, with v6.0.2 as the preferred stable SDK. The previous 157-variant baseline was validated on ESP-IDF v6.0.1; the current matrix contains 171 variants, of which 170 support IDF 6.0.x and the ESP32-S31 variant requires IDF 6.1 or later.
 - MQTT and BluFi cryptographic code has migrated to PSA Crypto. IDF 6 component splits and third-party dependency compatibility have also been addressed.
 - Audio pipeline concurrency, MQTT/UDP packet validation, and release-matrix selection have been hardened.
@@ -116,6 +117,8 @@ The firmware connects to the official [xiaozhi.me](https://xiaozhi.me) server by
 - [MCP Protocol Interaction Flow](docs/mcp-protocol.md) - Device-side MCP protocol implementation
 - [MQTT + UDP Hybrid Communication Protocol Document](docs/mqtt-udp.md)
 - [A detailed WebSocket communication protocol document](docs/websocket.md)
+- [Yana Wheelbot board](main/boards/yana-wheelbot) - Wheeled robot board: motor tools, ToF anti-fall sensor, LEDs, arm/neck servos
+- [Wheelbot web controller](apps/controller-web) - Browser-based control panel for the board above
 
 ## Large Model Configuration
 
