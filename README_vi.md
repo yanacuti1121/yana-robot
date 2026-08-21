@@ -16,6 +16,7 @@ Repo này là một nhánh phát triển độc lập: không liên kết và kh
 
 ## Cập nhật gần đây
 
+- Board mới: [`yana-wheelbot`](main/boards/yana-wheelbot) — robot bánh xe với động cơ chọn được lúc chạy (servo 360° hoặc driver DC L298N), cảm biến chống rơi VL53L0X, 2 LED, servo tay+cổ, và đổi hướng/theme màn hình được — tất cả expose qua MCP tools. Đi kèm [`apps/controller-web`](apps/controller-web), một app web điều khiển kết nối qua cùng kênh WebSocket/MCP local mà giao thức cloud dùng.
 - Nhánh chính hiện nhắm tới ESP-IDF v6.0 trở lên, ưu tiên bản ổn định v6.0.2. Bộ 157 biến thể release trước đó đã được kiểm chứng trên ESP-IDF v6.0.1; ma trận hiện tại có 171 biến thể, trong đó 170 hỗ trợ IDF 6.0.x và biến thể ESP32-S31 cần IDF 6.1 trở lên.
 - Mã hóa MQTT và BluFi đã chuyển sang PSA Crypto. Việc tách component của IDF 6 và tương thích dependency bên thứ ba cũng đã được xử lý.
 - Đã gia cố xử lý đồng thời trong audio pipeline, kiểm tra gói tin MQTT/UDP, và logic chọn ma trận release.
@@ -116,6 +117,8 @@ Firmware mặc định kết nối tới server chính thức [xiaozhi.me](https
 - [Luồng tương tác giao thức MCP](docs/mcp-protocol.md) - Cách triển khai giao thức MCP phía thiết bị
 - [Tài liệu giao thức truyền thông lai MQTT + UDP](docs/mqtt-udp.md)
 - [Tài liệu chi tiết giao thức truyền thông WebSocket](docs/websocket.md)
+- [Board Yana Wheelbot](main/boards/yana-wheelbot) - Board robot bánh xe: motor tools, cảm biến ToF chống rơi, LED, servo tay/cổ
+- [App web điều khiển Wheelbot](apps/controller-web) - App web điều khiển cho board trên
 
 ## Cấu hình mô hình lớn
 
