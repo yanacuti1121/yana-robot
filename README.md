@@ -1,16 +1,18 @@
-# An MCP-based Chatbot
+# Yana Robot
 
-(English | [中文](README_zh.md) | [日本語](README_ja.md))
+(English | [Tiếng Việt](README_vi.md) | [한국어](README_ko.md))
 
-## Introduction
+## Overview
 
-👉 [Human: Give AI a camera vs AI: Instantly finds out the owner hasn't washed hair for three days【bilibili】](https://www.bilibili.com/video/BV1bpjgzKEhd/)
-
-👉 [Handcraft your AI girlfriend, beginner's guide【bilibili】](https://www.bilibili.com/video/BV1XnmFYLEJN/)
-
-As a voice interaction entry, the XiaoZhi AI chatbot leverages the AI capabilities of large models like Qwen / DeepSeek, and achieves multi-terminal control via the MCP protocol.
+Yana Robot is MCP-based voice-assistant firmware for ESP32 hardware. It combines offline wake-word detection, streaming ASR/LLM/TTS pipelines, WebSocket and MQTT+UDP transports, and device-side + cloud-side MCP tool control, across a wide range of board variants.
 
 <img src="docs/mcp-based-graph.jpg" alt="Control everything via MCP" width="320">
+
+## Origin
+
+Yana Robot is built on top of the [XiaoZhi AI Chatbot](https://github.com/78/xiaozhi-esp32) project, the original open-source ESP32 voice-assistant firmware created by Xiaoqiang ([78](https://github.com/78)) and Shenzhen Xinzhi Future Technology Co., Ltd. Full credit for the original codebase, protocol design, and hardware ecosystem goes to that project and its contributors.
+
+This repository is an independent continuation: it is not affiliated with, and does not track, the upstream project. From this point forward, boards, fixes, and features here are designed and maintained separately as Yana Robot.
 
 ## Recent Updates
 
@@ -36,16 +38,6 @@ As a voice interaction entry, the XiaoZhi AI chatbot leverages the AI capabiliti
 - Customizable wake words, fonts, emojis, and chat backgrounds with online web-based editing ([Custom Assets Generator](https://github.com/78/xiaozhi-assets-generator))
 
 ## Hardware
-
-### Breadboard DIY Practice
-
-See the Feishu document tutorial:
-
-👉 ["XiaoZhi AI Chatbot Encyclopedia"](https://ccnphfhqs21z.feishu.cn/wiki/F5krwD16viZoF0kKkvDcrZNYnhb?from=from_copylink)
-
-Breadboard demo:
-
-![Breadboard Demo](docs/v1/wiring2.jpg)
 
 ### Supports 138 Board Directories and 171 Release Variants (Partial List)
 
@@ -109,8 +101,6 @@ For beginners, it is recommended to use the firmware that can be flashed without
 
 The firmware connects to the official [xiaozhi.me](https://xiaozhi.me) server by default. Personal users can register an account to use the Qwen real-time model for free.
 
-👉 [Beginner's Firmware Flashing Guide](https://ccnphfhqs21z.feishu.cn/wiki/Zpz4wXBtdimBrLk25WdcXzxcnNS)
-
 ### Development Environment
 
 - Cursor or VSCode
@@ -121,7 +111,7 @@ The firmware connects to the official [xiaozhi.me](https://xiaozhi.me) server by
 ### Developer Documentation
 
 - [ESP-IDF 6.0 Migration Guide](docs/esp-idf-6-migration.md) - SDK compatibility, component changes, legacy hardware support, and board validation status
-- [Custom Board Guide](docs/custom-board.md) - Learn how to create custom boards for XiaoZhi AI
+- [Custom Board Guide](docs/custom-board.md) - Learn how to create custom boards
 - [MCP Protocol IoT Control Usage](docs/mcp-usage.md) - Learn how to control IoT devices via MCP protocol
 - [MCP Protocol Interaction Flow](docs/mcp-protocol.md) - Device-side MCP protocol implementation
 - [MQTT + UDP Hybrid Communication Protocol Document](docs/mqtt-udp.md)
@@ -129,20 +119,18 @@ The firmware connects to the official [xiaozhi.me](https://xiaozhi.me) server by
 
 ## Large Model Configuration
 
-If you already have a XiaoZhi AI chatbot device and have connected to the official server, you can log in to the [xiaozhi.me](https://xiaozhi.me) console for configuration.
-
-👉 [Backend Operation Video Tutorial (Old Interface)](https://www.bilibili.com/video/BV1jUCUY2EKM/)
+If you already have a device connected to the official server, you can log in to the [xiaozhi.me](https://xiaozhi.me) console for configuration.
 
 ## Related Open Source Projects
 
-For server deployment on personal computers, refer to the following open-source projects:
+The firmware speaks the XiaoZhi communication protocol. For server deployment on personal computers, the following third-party open-source projects are compatible:
 
 - [xinnan-tech/xiaozhi-esp32-server](https://github.com/xinnan-tech/xiaozhi-esp32-server) Python server
 - [joey-zhou/xiaozhi-esp32-server-java](https://github.com/joey-zhou/xiaozhi-esp32-server-java) Java server
 - [AnimeAIChat/xiaozhi-server-go](https://github.com/AnimeAIChat/xiaozhi-server-go) Golang server
 - [hackers365/xiaozhi-esp32-server-golang](https://github.com/hackers365/xiaozhi-esp32-server-golang) Golang server
 
-Other client projects using the XiaoZhi communication protocol:
+Other client projects using the same protocol:
 
 - [huangjunsen0406/py-xiaozhi](https://github.com/huangjunsen0406/py-xiaozhi) Python client
 - [TOM88812/xiaozhi-android-client](https://github.com/TOM88812/xiaozhi-android-client) Android client
@@ -154,20 +142,20 @@ Custom Assets Tools:
 
 - [78/xiaozhi-assets-generator](https://github.com/78/xiaozhi-assets-generator) Custom Assets Generator (Wake words, fonts, emojis, backgrounds)
 
-## About the Project
+## About This Project
 
-This is an open-source ESP32 project, released under the MIT license, allowing anyone to use it for free, including for commercial purposes.
+Yana Robot is released under the MIT license, allowing anyone to use it for free, including for commercial purposes. The license file preserves the original copyright notice from the upstream XiaoZhi project, as required by that license.
 
-We hope this project helps everyone understand AI hardware development and apply rapidly evolving large language models to real hardware devices.
+The original firmware, protocol design, and board ecosystem were created by [78/xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) and its contributors. Everything in this repository from this point forward — new boards, bug fixes, and feature work — is designed and maintained independently under the Yana Robot name, with no ongoing affiliation to the upstream project.
 
-If you have any ideas or suggestions, please feel free to raise Issues or join our [Discord](https://discord.gg/C759fGMBcZ) or QQ group: 1095994019
+If you have any ideas or suggestions, please open an Issue on this repository.
 
 ## Star History
 
-<a href="https://star-history.com/#78/xiaozhi-esp32&Date">
+<a href="https://star-history.com/#yanacuti1121/yana-robot&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=78/xiaozhi-esp32&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=78/xiaozhi-esp32&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=78/xiaozhi-esp32&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=yanacuti1121/yana-robot&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=yanacuti1121/yana-robot&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=yanacuti1121/yana-robot&type=Date" />
  </picture>
 </a>
