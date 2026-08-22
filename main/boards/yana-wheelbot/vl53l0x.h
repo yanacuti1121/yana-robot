@@ -2,6 +2,7 @@
 #define VL53L0X_H
 
 #include "i2c_device.h"
+#include "tof_sensor.h"
 
 // Minimal VL53L0X time-of-flight distance sensor driver, following
 // main/boards/common/i2c_device.h's I2cDevice pattern (same base class used by
@@ -18,16 +19,14 @@
 // numbers presented as correct. Readings should be verified against a known
 // distance on real hardware before being trusted; if accuracy is insufficient,
 // replace this with ST's official API or a maintained ESP-IDF component.
-class Vl53l0x : public I2cDevice {
+class Vl53l0x : public I2cDevice, public TofSensor {
 public:
     Vl53l0x(i2c_master_bus_handle_t i2c_bus, uint8_t addr = 0x29);
 
     // Returns true if the model-ID register matches the known VL53L0X value.
     bool Probe();
 
-    // Triggers a single-shot ranging measurement and returns the result in
-    // millimeters, or -1 on timeout/error.
-    int ReadDistanceMm();
+    int ReadDistanceMm() override;
 
 private:
     static constexpr uint8_t kRegModelId = 0xC0;

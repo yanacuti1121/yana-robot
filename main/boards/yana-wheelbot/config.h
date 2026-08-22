@@ -126,4 +126,7 @@ constexpr HardwareConfig WHEELBOT_HARDWARE_CONFIG = {
 // VL53L0X default 7-bit I2C address.
 #define VL53L0X_I2C_ADDR 0x29
 
+// VL6180X default 7-bit I2C address (same default as VL53L0X, coincidentally).
+#define VL6180X_I2C_ADDR 0x29
+
 #endif  // _BOARD_CONFIG_H_

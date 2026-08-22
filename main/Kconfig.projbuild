@@ -600,6 +600,22 @@ choice BOARD_TYPE
     config BOARD_TYPE_YANA_WHEELBOT
         bool "Yana Wheelbot"
         depends on IDF_TARGET_ESP32S3
+    config YANA_WHEELBOT_DISPLAY_ST7735
+        bool "Yana Wheelbot: use ST7735 display driver instead of ST7789"
+        depends on BOARD_TYPE_YANA_WHEELBOT
+        default n
+        help
+            Select if your display module uses the ST7735 panel IC (e.g. the
+            one on the KST AI Robot's public wiring diagram) instead of the
+            default ST7789. Pulls in waveshare/esp_lcd_st7735.
+    config YANA_WHEELBOT_TOF_VL6180X
+        bool "Yana Wheelbot: use VL6180X ToF sensor instead of VL53L0X"
+        depends on BOARD_TYPE_YANA_WHEELBOT
+        default n
+        help
+            Select if your anti-fall sensor is a VL6180X (shorter range,
+            ~200mm max) instead of the default VL53L0X (~2m max). Both are
+            I2C; only the driver differs.
     config BOARD_TYPE_YUNLIAO_S3
         bool "Yunliao S3 (小智云聊)"
         depends on IDF_TARGET_ESP32S3
