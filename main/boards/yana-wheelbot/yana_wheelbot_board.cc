@@ -5,6 +5,10 @@
 #include <esp_lcd_panel_vendor.h>
 #include <esp_log.h>
 
+#if CONFIG_YANA_WHEELBOT_DISPLAY_ST7735
+#include <esp_lcd_st7735.h>
+#endif
+
 #include "application.h"
 #include "arm_neck_controller.h"
 #include "button.h"
@@ -16,7 +20,9 @@
 #include "dual_led_controller.h"
 #include "mcp_server.h"
 #include "settings.h"
+#include "tof_sensor.h"
 #include "vl53l0x.h"
+#include "vl6180x.h"
 #include "websocket_control_server.h"
 #include "wheelbot_controller.h"
 #include "wifi_board.h"
@@ -58,7 +64,7 @@ private:
     Button boot_button_;
     AudioCodec* audio_codec_ = nullptr;
     i2c_master_bus_handle_t tof_i2c_bus_ = nullptr;
-    Vl53l0x* tof_sensor_ = nullptr;
+    TofSensor* tof_sensor_ = nullptr;
     WebSocketControlServer* ws_control_server_ = nullptr;
 
     WheelbotController* wheelbot_controller_ = nullptr;
@@ -105,7 +111,11 @@ private:
         panel_config.rgb_ele_order = DISPLAY_RGB_ORDER;
         panel_config.bits_per_pixel = 16;
 
+#if CONFIG_YANA_WHEELBOT_DISPLAY_ST7735
+        ESP_ERROR_CHECK(esp_lcd_new_panel_st7735(panel_io, &panel_config, &panel));
+#else
         ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(panel_io, &panel_config, &panel));
+#endif
 
         esp_lcd_panel_reset(panel);
         esp_lcd_panel_init(panel);
@@ -172,7 +182,11 @@ private:
             .flags = {.enable_internal_pullup = 1},
         };
         ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_bus_cfg, &tof_i2c_bus_));
+#if CONFIG_YANA_WHEELBOT_TOF_VL6180X
+        tof_sensor_ = new Vl6180x(tof_i2c_bus_, VL6180X_I2C_ADDR);
+#else
         tof_sensor_ = new Vl53l0x(tof_i2c_bus_, VL53L0X_I2C_ADDR);
+#endif
     }
 
     void InitializeWebSocketControlServer() {

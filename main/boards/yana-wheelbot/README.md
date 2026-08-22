@@ -6,6 +6,19 @@ servo pair or L298N DC motor driver), a VL53L0X anti-fall sensor, dual LEDs,
 arm+neck servos, and switchable display orientation/theme — on top of the
 platform's existing voice AI and animated-face display.
 
+## Credit
+
+The GPIO defaults in `config.h` (motor, ToF, LED, arm/neck, mic, display pins)
+are aligned with the [KST AI Robot](https://ai.kenhsangtao.com/)'s publicly
+published wiring diagram — a real, community-built ESP32-S3 robot from the
+Vietnamese "Kênh Sáng Tạo" channel with a nearly identical feature set (dual
+motor backend, arm/neck servos, ToF anti-fall, dual LED, voice AI). Only pin
+*numbers* from their public diagram were used; no code was taken from their
+firmware (a closed binary with no stated reuse license — see the diagram
+fetch date and details in this project's own history for what was and
+wasn't used). This board's firmware, board definition, and MCP tools are
+written independently.
+
 Local control (no cloud round-trip) works the same way as
 `main/boards/otto-robot`: this board runs a WebSocket server on port 8080 that
 forwards messages directly into the same MCP tool dispatch used by the cloud
@@ -52,8 +65,12 @@ drive the robot over the LAN.
 - **L298N pin convention**: this board assumes one PWM/EN pin + one direction
   pin per side (`in1`=left PWM, `in2`=left DIR, `in3`=right PWM, `in4`=right
   DIR). Some L298N breakouts wire IN1-4 differently (4 direct H-bridge-leg
-  pins, no separate EN). Verify against your actual module before trusting
-  `l298n_motor_driver.cc`.
+  pins, no separate EN). The KST AI Robot's firmware strings (see the
+  "Credit" section above) suggest their "mini motor driver" uses static
+  (non-PWM) levels directly on IN1-4 for a similar module — this is a signal
+  worth investigating, not a confirmed spec, since it came from binary
+  strings, not documented source. Verify against your actual module before
+  trusting `l298n_motor_driver.cc`.
 - **Continuous-rotation servo speed mapping** (`servo_motor_driver.cc`): the
   microseconds-per-percent-speed slope is a reasonable default, not measured
   against a real servo. Tune via `self.wheelbot.set_servo_stop_pulse` and the

@@ -10,7 +10,7 @@ static const char* TAG = "CliffSensorController";
 static constexpr const char* kNamespace = "cliff_sensor";
 static constexpr int kPollIntervalMs = 200;
 
-CliffSensorController::CliffSensorController(Vl53l0x* sensor,
+CliffSensorController::CliffSensorController(TofSensor* sensor,
                                              WheelbotController* wheelbot_controller)
     : sensor_(sensor), wheelbot_controller_(wheelbot_controller) {
     Settings settings(kNamespace, true);
