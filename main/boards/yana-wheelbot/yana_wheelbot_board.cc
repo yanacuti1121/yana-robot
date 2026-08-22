@@ -62,6 +62,7 @@ class YanaWheelbotBoard : public WifiBoard {
 private:
     LcdDisplay* display_ = nullptr;
     Button boot_button_;
+    Button touch_button_;
     AudioCodec* audio_codec_ = nullptr;
     i2c_master_bus_handle_t tof_i2c_bus_ = nullptr;
     TofSensor* tof_sensor_ = nullptr;
@@ -157,6 +158,10 @@ private:
             }
             app.ToggleChatState();
         });
+        // TTP223 double-tap toggles chat, mirroring the boot button above and
+        // the KST AI Robot's own double-tap-to-chat behavior on this same pin.
+        touch_button_.OnDoubleClick(
+            [this]() { Application::GetInstance().ToggleChatState(); });
     }
 
     void InitializeAudioCodec() {
@@ -210,7 +215,9 @@ private:
     }
 
 public:
-    YanaWheelbotBoard() : boot_button_(BOOT_BUTTON_GPIO) {
+    YanaWheelbotBoard()
+        : boot_button_(BOOT_BUTTON_GPIO),
+          touch_button_(WHEELBOT_HARDWARE_CONFIG.touch_sensor_pin, /*active_high=*/true) {
         InitializeSpi();
         InitializeLcdDisplay();
         InitializeButtons();

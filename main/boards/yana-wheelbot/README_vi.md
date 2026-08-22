@@ -11,25 +11,37 @@ phần voice AI + màn hình biểu cảm có sẵn của nền tảng.
 
 | Bộ phận | Linh kiện gợi ý | Ghi chú |
 |---|---|---|
-| Vi điều khiển | ESP32-S3 (bất kỳ board dev nào có đủ chân) | `target: esp32s3` trong `config.json` |
-| Driver động cơ (chọn 1) | 2x servo xoay liên tục (continuous-rotation) | Kéo bánh trực tiếp, không cần driver rời |
+| Vi điều khiển | ESP32-S3-WROOM-1 N16R8 (16MB flash / 8MB PSRAM) | `target: esp32s3` trong `config.json` |
+| Driver động cơ (chọn 1) | 2x servo xoay liên tục 360° | Kéo bánh trực tiếp, không cần driver rời |
 | | *hoặc* L298N + 2 động cơ DC | Xem lưu ý về quy ước chân IN1-4 ở phần "Chưa xác minh" |
 | Cảm biến chống rơi (ToF, I2C) | VL53L0X (mặc định, tầm ~2m) | |
-| | *hoặc* VL6180X (build option, tầm ~200mm) | Xem "Chọn biến thể lúc build" |
+| | *hoặc* VL6180X / TOF050C (build option, tầm ~200mm) | Xem "Chọn biến thể lúc build" |
 | LED | 2x LED đơn (trái/phải) | |
 | Servo tay + cổ | 2x servo góc thường (0-180°) | |
+| Cảm biến chạm | Module cảm ứng chạm TTP223 | Chạm đôi để bật/tắt trò chuyện, giống nút boot |
 | Mic | I2S, kiểu INMP441 hoặc tương đương | |
-| Loa | I2S amp, kiểu MAX98357A | |
+| Loa | I2S amp kiểu MAX98357A + loa 3W/4Ω | Cần nguồn 5V riêng đủ mạnh — xem lưu ý nguồn bên dưới |
 | Màn hình | SPI ST7789 128x160 (mặc định) | |
 | | *hoặc* ST7735 (build option) | Xem "Chọn biến thể lúc build" |
 | Nút Boot | có sẵn trên board ESP32-S3 (GPIO0) | Không cần thêm |
+| Nguồn | Pin Li-ion/LiPo 3.7V, ~2000mAh | |
+| | Mạch sạc + tăng áp 5V TP4056 Type-C | |
+| | Công tắc nguồn ON/OFF | |
+
+**Lưu ý nguồn:** loa khuếch đại và 2 servo bánh xe cần nguồn 5V riêng đủ
+mạnh (không lấy thẳng từ bộ ổn áp 3.3V của MCU) — một mạch tăng áp như
+TP4056 lo được việc này từ 1 cell LiPo 3.7V. Tất cả GND (MCU, amp, servo,
+cảm biến) vẫn phải nối chung.
 
 ## Sơ đồ đấu nối (mặc định)
 
+![Sơ đồ đấu nối Yana Wheelbot](wiring-diagram.svg)
+
 Chân GPIO mặc định lấy theo sơ đồ đấu nối công khai của
 [KST AI Robot](https://ai.kenhsangtao.com/) (xem mục "Credit" bên dưới) —
-đa số đã xác nhận khớp với sơ đồ đó, 2 chân còn lại là tự chọn (đánh dấu rõ ở
-cột Ghi chú). Toàn bộ định nghĩa nằm ở `config.h`.
+mọi chân dưới đây đều đã xác nhận khớp với sơ đồ đó, trừ backlight màn hình
+là tự chọn riêng của dự án này (đánh dấu ở cột Ghi chú). Toàn bộ định nghĩa
+nằm ở `config.h`.
 
 | Bộ phận | Tín hiệu | GPIO | Ghi chú |
 |---|---|---|---|
@@ -45,13 +57,14 @@ cột Ghi chú). Toàn bộ định nghĩa nằm ở `config.h`.
 | | Phải | 18 | |
 | Servo tay | Tín hiệu | 20 | |
 | Servo cổ | Tín hiệu | 21 | |
+| Cảm biến chạm (TTP223) | OUT | 7 | Active-high; chạm đôi để bật/tắt trò chuyện |
 | Mic (I2S) | WS | 4 | |
 | | SCK | 5 | |
 | | DIN | 6 | |
-| Loa (I2S) | DOUT | 9 | **Chưa xác nhận** — không thấy rõ trong sơ đồ KST, tự chọn chân trống |
+| Loa (I2S) | DIN | 17 | |
 | | BCLK | 16 | |
 | | LRCK | 15 | |
-| Màn hình (SPI) | Backlight | 17 | **Chưa xác nhận** — module ST7735 của KST có thể không có chân backlight riêng |
+| Màn hình (SPI) | Backlight | 9 | Tự chọn riêng của dự án này — module của KST nối BL thẳng vào 3V3, không điều khiển bằng phần mềm |
 | | MOSI | 11 | |
 | | CLK | 12 | |
 | | DC | 10 | |
@@ -61,6 +74,9 @@ cột Ghi chú). Toàn bộ định nghĩa nằm ở `config.h`.
 Chân IN1-4 của motor (và loại motor servo/L298N) có thể đổi lúc chạy qua MCP
 tool, lưu vào NVS, không cần nạp lại firmware — các giá trị trên chỉ là mặc
 định lúc mới nạp.
+
+**Không dùng GPIO36/GPIO37** — dành riêng cho PSRAM trên module
+ESP32-S3-WROOM-1 N16R8.
 
 ## Chọn biến thể lúc build
 
@@ -130,15 +146,18 @@ backend nào nói đúng giao thức này (ví dụ dự án `Yana-AI`'s
 
 ## Credit
 
-Chân GPIO mặc định trong `config.h` (motor, ToF, LED, tay/cổ, mic, màn hình)
-được căn theo sơ đồ đấu nối công khai của
-[KST AI Robot](https://ai.kenhsangtao.com/) — một robot ESP32-S3 thật, do
-cộng đồng xây dựng, từ kênh "Kênh Sáng Tạo" (Việt Nam), có tính năng gần
-giống hệt (driver động cơ chọn được, servo tay/cổ, chống rơi ToF, LED đôi,
-voice AI). Chỉ lấy **số GPIO** từ sơ đồ công khai của họ; không lấy bất kỳ
-dòng code nào từ firmware của họ (một file binary đóng, không nêu license
-cho phép tái sử dụng). Firmware, board definition, và MCP tool ở đây được
-viết độc lập.
+Chân GPIO mặc định trong `config.h` (motor, ToF, LED, tay/cổ, cảm biến chạm,
+mic, loa, màn hình) được căn theo sơ đồ đấu nối công khai và trang firmware
+center của [KST AI Robot](https://ai.kenhsangtao.com/)
+(`kenhsangtao.github.io/robotai`) — một robot ESP32-S3 thật, do cộng đồng
+xây dựng, từ kênh "Kênh Sáng Tạo" (Việt Nam), có tính năng gần giống hệt
+(driver động cơ chọn được, servo tay/cổ, chống rơi ToF, LED đôi, cảm biến
+chạm, voice AI). Chỉ lấy **số GPIO** và **tên linh kiện công khai** từ trang
+của họ; không lấy bất kỳ dòng code, hình ảnh, hay văn bản nào từ firmware
+(một file binary đóng, không nêu license cho phép tái sử dụng) hay website
+của họ. `wiring-diagram.svg` ở trên là sơ đồ gốc do dự án này tự vẽ lại từ
+các dữ kiện công khai đó — không phải bản sao ảnh sơ đồ của họ. Firmware,
+board definition, và MCP tool ở đây được viết độc lập.
 
 ## Chưa xác minh trên phần cứng thật
 
@@ -170,3 +189,7 @@ thật nào chạy thử** — cần kiểm chứng trước khi tin tưởng ho
   ngay lập tức — vì gọi lại `esp_lcd_panel_swap_xy`/`mirror` lúc đang chạy
   mà không khởi động lại chưa được xác minh an toàn với cặp panel/driver
   này.
+- **Cảm biến chạm TTP223**: đấu như một `Button` digital active-high đơn
+  giản (`OnDoubleClick`) — module TTP223 giá rẻ đôi khi nhiễu/tự kích hoạt
+  nếu nguồn 3V3 không ổn định; hành vi debounce chưa được test trên phần
+  cứng thật.

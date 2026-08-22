@@ -12,26 +12,37 @@ voice AI and animated-face display.
 
 | Part | Suggested component | Notes |
 |---|---|---|
-| MCU | ESP32-S3 (any dev board with enough pins) | `target: esp32s3` in `config.json` |
-| Motor driver (pick one) | 2x continuous-rotation servo | Drives the wheels directly, no separate driver needed |
+| MCU | ESP32-S3-WROOM-1 N16R8 (16MB flash / 8MB PSRAM) | `target: esp32s3` in `config.json` |
+| Motor driver (pick one) | 2x continuous-rotation (360°) servo | Drives the wheels directly, no separate driver needed |
 | | *or* L298N + 2x DC motor | See the IN1-4 pin-convention caveat in "Not yet verified on real hardware" |
 | Anti-fall sensor (ToF, I2C) | VL53L0X (default, ~2m range) | |
-| | *or* VL6180X (build option, ~200mm range) | See "Build-time variant selection" |
+| | *or* VL6180X / TOF050C (build option, ~200mm range) | See "Build-time variant selection" |
 | LEDs | 2x single LED (left/right) | |
 | Arm + neck servos | 2x standard angle servo (0-180°) | |
+| Touch sensor | TTP223 capacitive touch module | Double-tap toggles chat, same as the boot button |
 | Mic | I2S, e.g. INMP441 or equivalent | |
-| Speaker | I2S amp, e.g. MAX98357A | |
+| Speaker | I2S amp, e.g. MAX98357A + 3W/4Ω speaker | Needs its own strong 5V rail — see power note below |
 | Display | SPI ST7789 128x160 (default) | |
 | | *or* ST7735 (build option) | See "Build-time variant selection" |
 | Boot button | already on the ESP32-S3 dev board (GPIO0) | Nothing extra needed |
+| Power | Li-ion/LiPo 3.7V, ~2000mAh | |
+| | TP4056 Type-C charge + 5V boost module | |
+| | ON/OFF power switch | |
+
+**Power note:** the speaker amp and both wheel servos need their own strong
+5V rail (not powered straight off the MCU's 3.3V regulator) — a boost
+module like TP4056 handles this from a single 3.7V LiPo cell. All grounds
+(MCU, amp, servos, sensors) must still be tied together.
 
 ## Default wiring
 
+![Yana Wheelbot wiring diagram](wiring-diagram.svg)
+
 Default GPIO pins are taken from the [KST AI Robot](https://ai.kenhsangtao.com/)'s
-publicly published wiring diagram (see the "Credit" section below) — most
-are confirmed against that diagram, the remaining two are this project's own
-free-pin picks (flagged in the Notes column). All definitions live in
-`config.h`.
+publicly published wiring diagram (see the "Credit" section below) — every
+pin below is confirmed against that diagram except the display backlight,
+which is this project's own free-pin pick (flagged in the Notes column).
+All definitions live in `config.h`.
 
 | Part | Signal | GPIO | Notes |
 |---|---|---|---|
@@ -47,13 +58,14 @@ free-pin picks (flagged in the Notes column). All definitions live in
 | | Right | 18 | |
 | Arm servo | Signal | 20 | |
 | Neck servo | Signal | 21 | |
+| Touch sensor (TTP223) | OUT | 7 | Active-high; double-tap toggles chat |
 | Mic (I2S) | WS | 4 | |
 | | SCK | 5 | |
 | | DIN | 6 | |
-| Speaker (I2S) | DOUT | 9 | **Not confirmed** — not legible in KST's diagram, picked as a free pin |
+| Speaker (I2S) | DIN | 17 | |
 | | BCLK | 16 | |
 | | LRCK | 15 | |
-| Display (SPI) | Backlight | 17 | **Not confirmed** — KST's ST7735 module may not expose a separate backlight pin |
+| Display (SPI) | Backlight | 9 | This project's own free-pin pick — KST's module ties BL straight to 3V3, no software control |
 | | MOSI | 11 | |
 | | CLK | 12 | |
 | | DC | 10 | |
@@ -63,6 +75,9 @@ free-pin picks (flagged in the Notes column). All definitions live in
 Motor IN1-4 pins (and the servo/L298N backend choice) can be changed at
 runtime via an MCP tool, persisted to NVS, no reflash required — the values
 above are only the first-boot defaults.
+
+**Do not use GPIO36/GPIO37** — reserved for PSRAM on the ESP32-S3-WROOM-1
+N16R8 module.
 
 ## Build-time variant selection
 
@@ -132,14 +147,19 @@ project's `tools/yana-web/robot.js`).
 
 ## Credit
 
-The GPIO defaults in `config.h` (motor, ToF, LED, arm/neck, mic, display pins)
-are aligned with the [KST AI Robot](https://ai.kenhsangtao.com/)'s publicly
-published wiring diagram — a real, community-built ESP32-S3 robot from the
-Vietnamese "Kênh Sáng Tạo" channel with a nearly identical feature set (dual
-motor backend, arm/neck servos, ToF anti-fall, dual LED, voice AI). Only pin
-*numbers* from their public diagram were used; no code was taken from their
-firmware (a closed binary with no stated reuse license). This board's
-firmware, board definition, and MCP tools are written independently.
+The GPIO defaults in `config.h` (motor, ToF, LED, arm/neck, touch, mic,
+speaker, display pins) are aligned with the
+[KST AI Robot](https://ai.kenhsangtao.com/)'s publicly published wiring
+diagram and firmware center (`kenhsangtao.github.io/robotai`) — a real,
+community-built ESP32-S3 robot from the Vietnamese "Kênh Sáng Tạo" channel
+with a nearly identical feature set (dual motor backend, arm/neck servos,
+ToF anti-fall, dual LED, touch sensor, voice AI). Only pin *numbers* and
+publicly listed part names were used; no code, artwork, or text was copied
+from their firmware (a closed binary with no stated reuse license) or their
+website. `wiring-diagram.svg` above is this project's own original diagram,
+redrawn from those public facts — not a copy of their diagram image. This
+board's firmware, board definition, and MCP tools are written
+independently.
 
 ## Not yet verified on real hardware
 
@@ -170,3 +190,7 @@ robot has run this yet** — verify before fully trusting it:
 - **Display orientation**: applied via a reboot rather than a live re-layout,
   since re-invoking `esp_lcd_panel_swap_xy`/`mirror` at runtime without a
   reboot is not verified safe on this panel/driver combination.
+- **TTP223 touch sensor**: wired as a plain active-high digital `Button`
+  (`OnDoubleClick`) — TTP223 modules are cheap and sometimes noisy/self-
+  triggering without a stable 3V3 rail; debounce behavior has not been
+  tested on real hardware.
