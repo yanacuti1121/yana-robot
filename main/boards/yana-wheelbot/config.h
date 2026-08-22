@@ -4,19 +4,22 @@
 #include <driver/gpio.h>
 
 // GPIO defaults below are aligned with the KST AI Robot's publicly published
-// wiring diagram (ai.kenhsangtao.com/docs/Wiring-Diagram-ST7735-EN.svg) --
-// a real, community-tested ESP32-S3 robot with the same feature set
-// (dual motor backend, arm/neck servos, ToF anti-fall, dual LED). Only the
-// pin *numbers* are taken from that public diagram; no firmware code was
-// copied from their (closed-source, no reuse license stated) binary.
-// motor_in1-4, tof_i2c_*, servo_right_pin, and led_*/arm/neck/mic pins below
-// match their diagram exactly. audio_i2s_spk_gpio_dout and
-// display_backlight_pin are NOT covered by that diagram (not shown/legible
-// in the source SVG) -- picked as free GPIOs on this pinout, not confirmed
-// against their hardware. Runtime-remappable pins (motor IN1-4, servo
-// stop-pulse/reverse) are stored in NVS via Settings and can be changed
-// from the app without re-flashing; the constants here are only the
-// first-boot defaults. Verify against your actual wiring before relying on them.
+// wiring diagram (ai.kenhsangtao.com/docs/So-do-dau-noi-ST7735.svg) -- a
+// real, community-tested ESP32-S3 robot with the same feature set (dual
+// motor backend, arm/neck servos, ToF anti-fall, dual LED, touch sensor).
+// Only the pin *numbers* are taken from that public diagram; no firmware
+// code was copied from their (closed-source, no reuse license stated)
+// binary. Every pin below matches their diagram exactly, including
+// audio_i2s_spk_gpio_dout (MAX98357A DIN -> GPIO17) and touch_sensor_pin
+// (TTP223 OUT -> GPIO7), both confirmed from the diagram image (previously
+// unconfirmed guesses in earlier commits). display_backlight_pin is NOT in
+// their diagram -- their ST7735 module ties BL straight to 3V3 (no
+// software control) -- so it remains this project's own free-pin pick, now
+// moved off GPIO17 since that pin is confirmed in use for audio DIN.
+// Runtime-remappable pins (motor IN1-4, servo stop-pulse/reverse) are
+// stored in NVS via Settings and can be changed from the app without
+// re-flashing; the constants here are only the first-boot defaults. Verify
+// against your actual wiring before relying on them.
 
 struct HardwareConfig {
     // Motor / servo drive (defaults; motor type + IN1-4 pins are overridable at
@@ -39,6 +42,11 @@ struct HardwareConfig {
     // Arm / neck servos
     gpio_num_t arm_servo_pin;
     gpio_num_t neck_servo_pin;
+
+    // Touch sensor (TTP223), digital active-high output. Double-tap toggles
+    // chat, mirroring the boot button's OnClick and the KST AI Robot's own
+    // double-tap-to-chat behavior.
+    gpio_num_t touch_sensor_pin;
 
     // Audio (I2S simplex: shared bus, separate mic/speaker pin sets)
     int audio_input_sample_rate;
@@ -80,26 +88,28 @@ constexpr HardwareConfig WHEELBOT_HARDWARE_CONFIG = {
     .arm_servo_pin = GPIO_NUM_20,
     .neck_servo_pin = GPIO_NUM_21,
 
+    // Matches KST wiring diagram exactly (TTP223 OUT).
+    .touch_sensor_pin = GPIO_NUM_7,
+
     // Mic pins match KST wiring diagram exactly (INMP441 on their board).
     .audio_input_sample_rate = 16000,
     .audio_output_sample_rate = 24000,
     .audio_i2s_mic_gpio_ws = GPIO_NUM_4,
     .audio_i2s_mic_gpio_sck = GPIO_NUM_5,
     .audio_i2s_mic_gpio_din = GPIO_NUM_6,
-    // Speaker LRC/BCLK match KST's diagram (MAX98357A); DOUT wasn't legible
-    // in the source SVG, so GPIO_NUM_9 here is our own free-pin pick, not
-    // confirmed against their hardware.
-    .audio_i2s_spk_gpio_dout = GPIO_NUM_9,
+    // Matches KST wiring diagram exactly (MAX98357A: DIN/LRC/BCLK).
+    .audio_i2s_spk_gpio_dout = GPIO_NUM_17,
     .audio_i2s_spk_gpio_bclk = GPIO_NUM_16,
     .audio_i2s_spk_gpio_lrck = GPIO_NUM_15,
 
     // Display SPI pins (MOSI/CLK/DC/CS/RST) match KST's diagram; their board
     // uses an ST7735 panel, this one uses ST7789 -- same 5 SPI signal roles,
     // different panel driver/init sequence in yana_wheelbot_board.cc.
-    // display_backlight_pin isn't shown in their diagram (their ST7735
-    // module may not expose a switchable backlight) -- GPIO_NUM_17 here is
-    // our own free-pin pick, not confirmed against their hardware.
-    .display_backlight_pin = GPIO_NUM_17,
+    // display_backlight_pin isn't in their diagram -- their ST7735 module
+    // ties BL straight to 3V3, no GPIO control -- so GPIO_NUM_9 here is our
+    // own free-pin pick (this board keeps software backlight control as a
+    // feature), not confirmed against their hardware.
+    .display_backlight_pin = GPIO_NUM_9,
     .display_mosi_pin = GPIO_NUM_11,
     .display_clk_pin = GPIO_NUM_12,
     .display_dc_pin = GPIO_NUM_10,
